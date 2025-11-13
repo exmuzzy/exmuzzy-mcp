@@ -354,6 +354,43 @@ The logs include:
 
 ## 🧪 Testing
 
+### Using Make Commands
+
+The project includes a comprehensive `Makefile` for easy testing:
+
+```bash
+# Show all available commands
+make help
+
+# Run all tests
+make test-all
+
+# Test specific functionality
+make test-grouped          # Test get_my_issues_grouped (preview)
+make test-grouped-full     # Test get_my_issues_grouped (full output)
+make test-priorities       # Check Jira priorities
+make test-current-user     # Get current user info
+make test-my-issues        # Test search_issues
+
+# Test specific issue
+make test-issue-detail ISSUE_KEY=RIVER-123
+
+# Test user search
+make test-search-users QUERY=Агафонов
+
+# View logs
+make logs                  # Real-time log viewing
+make logs-errors           # Show only errors
+
+# Development
+make build                 # Build project
+make lint                  # Run linter
+make format                # Format code
+make typecheck             # Type checking
+```
+
+### Manual Testing
+
 ```bash
 # Test the server connection
 JIRA_BASE_URL=https://your-company.atlassian.net \
