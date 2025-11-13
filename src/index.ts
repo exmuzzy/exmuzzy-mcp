@@ -14,6 +14,22 @@ import { JiraApiClient } from './jiraApiClient.js';
 import { JiraToolRegistry } from './toolRegistry.js';
 import { Logger } from './utils/logger.js';
 import { validateEnvironment } from './utils/validation.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Read package version
+let packageVersion = '1.0.8';
+try {
+  const packageJsonPath = join(__dirname, '..', 'package.json');
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+  packageVersion = packageJson.version;
+} catch (error) {
+  // Fallback to hardcoded version if package.json can't be read
+}
 
 const logger = new Logger('JiraMCPServer');
 
@@ -28,8 +44,8 @@ class JiraMCPServer {
 
     this.server = new Server(
       {
-        name: 'exmuzzy-mcp',
-        version: '1.0.6',
+        name: '@exmuzzy/jira-mcp',
+        version: packageVersion,
       },
       {
         capabilities: {
@@ -97,13 +113,16 @@ class JiraMCPServer {
 
   async start(): Promise<void> {
     try {
+      // Log version on startup
+      logger.info(`Starting Jira MCP Server v${packageVersion}`);
+      
       // Test Jira connection
       await this.apiClient.testConnection();
       
       const transport = new StdioServerTransport();
       await this.server.connect(transport);
       
-      logger.info('Jira MCP Server is running on stdio');
+      logger.info(`Jira MCP Server v${packageVersion} is running on stdio`);
     } catch (error) {
       logger.error('Failed to start server:', error);
       process.exit(1);
