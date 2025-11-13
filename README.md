@@ -308,6 +308,36 @@ Enable debug logging:
 export LOG_LEVEL=DEBUG
 ```
 
+### MCP Server Logs
+
+When running the MCP server through Cursor, you can find the logs here:
+
+**macOS:**
+```bash
+# View the latest MCP logs
+tail -f ~/Library/Application\ Support/Cursor/logs/*/window*/exthost/anysphere.cursor-mcp/MCP\ user-jira.log
+
+# Or list all log directories
+ls -lt ~/Library/Application\ Support/Cursor/logs/
+```
+
+**Windows:**
+```bash
+%APPDATA%\Cursor\logs\
+```
+
+**Linux:**
+```bash
+~/.config/Cursor/logs/
+```
+
+The logs include:
+- Connection status and errors
+- NPM package installation status
+- MCP protocol messages
+- Tool execution results
+- Error traces
+
 ## 🧪 Testing
 
 ```bash
