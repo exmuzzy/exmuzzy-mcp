@@ -80,10 +80,10 @@ npm run build
 
 **Ожидаемый результат:**
 ```
-> @exmuzzy/exmuzzy-mcp@1.0.6 build
+> @exmuzzy/jira-mcp@1.0.8 build
 > npm run clean && tsc && chmod +x dist/index.js
 
-> @exmuzzy/exmuzzy-mcp@1.0.6 clean
+> @exmuzzy/jira-mcp@1.0.8 clean
 > rimraf dist
 ```
 

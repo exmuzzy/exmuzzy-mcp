@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Node.js wrapper to start @exmuzzy/exmuzzy-mcp via npx
+// Node.js wrapper to start @exmuzzy/jira-mcp via npx
 import { spawn } from 'child_process';
 import { execSync } from 'child_process';
 import path from 'path';
@@ -11,7 +11,7 @@ const NPX_DIR = path.join(os.homedir(), '.npm', '_npx');
 // Try to find installed package
 function findPackage() {
   try {
-    const files = execSync(`find "${NPX_DIR}" -path "*/@exmuzzy/exmuzzy-mcp/bin/exmuzzy-mcp.js" 2>/dev/null`, { encoding: 'utf-8' }).trim();
+    const files = execSync(`find "${NPX_DIR}" -path "*/@exmuzzy/jira-mcp/bin/jira-mcp.js" 2>/dev/null`, { encoding: 'utf-8' }).trim();
     if (files) {
       const packagePath = files.split('\n')[0];
       if (fs.existsSync(packagePath)) {
@@ -35,7 +35,7 @@ async function main() {
   } else {
     // Package not found, install it
     try {
-      execSync('npx -y @exmuzzy/exmuzzy-mcp', { stdio: 'ignore' });
+      execSync('npx -y @exmuzzy/jira-mcp', { stdio: 'ignore' });
       // Wait a bit for installation
       await new Promise(resolve => setTimeout(resolve, 2000));
       packagePath = findPackage();
@@ -44,12 +44,12 @@ async function main() {
         await import('file://' + packagePath);
       } else {
         // Fallback: try to run via npx directly
-        const proc = spawn('npx', ['-y', '@exmuzzy/exmuzzy-mcp'], { stdio: 'inherit' });
+        const proc = spawn('npx', ['-y', '@exmuzzy/jira-mcp'], { stdio: 'inherit' });
         proc.on('exit', (code) => process.exit(code || 0));
       }
     } catch (e) {
       // Fallback: try to run via npx directly
-      const proc = spawn('npx', ['-y', '@exmuzzy/exmuzzy-mcp'], { stdio: 'inherit' });
+      const proc = spawn('npx', ['-y', '@exmuzzy/jira-mcp'], { stdio: 'inherit' });
       proc.on('exit', (code) => process.exit(code || 0));
     }
   }

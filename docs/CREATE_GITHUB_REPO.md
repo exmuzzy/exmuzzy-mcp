@@ -44,7 +44,7 @@ git add .
 # Создайте коммит
 git commit -m "feat: fork from original jira-mcp-server with custom modifications
 
-- Renamed package to @exmuzzy/exmuzzy-mcp
+- Renamed package to @exmuzzy/jira-mcp
 - Updated author and contributors
 - Added proper LICENSE with copyright
 - Fixed API v2 compatibility issue

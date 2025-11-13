@@ -55,7 +55,7 @@
   "mcpServers": {
     "jira": {
       "command": "npx",
-      "args": ["-y", "@exmuzzy/exmuzzy-mcp"],
+      "args": ["-y", "@exmuzzy/jira-mcp"],
       "env": {
         "JIRA_BASE_URL": "https://job.sbertroika.ru",
         "JIRA_BEARER_TOKEN": "your-bearer-token-here",

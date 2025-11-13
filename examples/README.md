@@ -13,7 +13,7 @@ Add the following to your Cursor MCP configuration:
   "mcpServers": {
     "jira": {
       "command": "npx",
-      "args": ["@exmuzzy/exmuzzy-mcp"],
+      "args": ["@exmuzzy/jira-mcp"],
       "env": {
         "JIRA_BASE_URL": "https://your-jira-instance.atlassian.net",
         "JIRA_EMAIL": "your-email@company.com",
@@ -69,7 +69,7 @@ Add to your Claude Desktop configuration:
   "mcpServers": {
     "jira": {
       "command": "npx",
-      "args": ["@exmuzzy/exmuzzy-mcp"],
+      "args": ["@exmuzzy/jira-mcp"],
       "env": {
         "JIRA_BASE_URL": "https://your-jira-instance.atlassian.net",
         "JIRA_EMAIL": "your-email@company.com",
@@ -150,7 +150,7 @@ Enable debug logging:
 
 ```bash
 export LOG_LEVEL=DEBUG
-npx @exmuzzy/exmuzzy-mcp
+npx @exmuzzy/jira-mcp
 ```
 
 ## API Reference

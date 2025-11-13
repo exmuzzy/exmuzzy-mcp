@@ -2,7 +2,7 @@
   "mcpServers": {
     "jira": {
       "command": "npx",
-      "args": ["@exmuzzy/exmuzzy-mcp"],
+      "args": ["@exmuzzy/jira-mcp"],
       "env": {
         "JIRA_BASE_URL": "https://your-jira-instance.atlassian.net",
         "JIRA_EMAIL": "your-email@company.com",

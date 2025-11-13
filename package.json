@@ -1,10 +1,10 @@
 {
-  "name": "@exmuzzy/exmuzzy-mcp",
+  "name": "@exmuzzy/jira-mcp",
   "version": "1.0.8",
   "description": "A comprehensive Model Context Protocol server for Jira integration with issue management, board operations, time tracking, and project management capabilities",
   "main": "dist/index.js",
   "bin": {
-    "exmuzzy-mcp": "./bin/exmuzzy-mcp.js"
+    "jira-mcp": "./bin/jira-mcp.js"
   },
   "type": "module",
   "scripts": {

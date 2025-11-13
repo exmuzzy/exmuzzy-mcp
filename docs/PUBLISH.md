@@ -26,7 +26,7 @@ npm whoami
 
 ## Шаг 3: Публикация пакета
 
-Для публикации scoped пакета (@exmuzzy/exmuzzy-mcp) нужно использовать флаг `--access public`:
+Для публикации scoped пакета (@exmuzzy/jira-mcp) нужно использовать флаг `--access public`:
 
 ```bash
 npm publish --access public
@@ -39,11 +39,11 @@ npm publish --access public
 После публикации проверьте, что пакет доступен:
 
 ```bash
-npm view @exmuzzy/exmuzzy-mcp
+npm view @exmuzzy/jira-mcp
 ```
 
 Или откройте в браузере:
-https://www.npmjs.com/package/@exmuzzy/exmuzzy-mcp
+https://www.npmjs.com/package/@exmuzzy/jira-mcp
 
 ## Шаг 5: Обновление конфигурации Cursor
 
@@ -54,7 +54,7 @@ https://www.npmjs.com/package/@exmuzzy/exmuzzy-mcp
   "mcpServers": {
     "jira": {
       "command": "npx",
-      "args": ["-y", "@exmuzzy/exmuzzy-mcp"],
+      "args": ["-y", "@exmuzzy/jira-mcp"],
       "env": {
         "JIRA_BASE_URL": "https://job.sbertroika.ru",
         "JIRA_BEARER_TOKEN": "your-bearer-token-here",

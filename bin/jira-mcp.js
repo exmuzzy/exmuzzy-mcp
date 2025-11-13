@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-// Wrapper script for @exmuzzy/exmuzzy-mcp
+// Wrapper script for @exmuzzy/jira-mcp
 import '../dist/index.js';
 
