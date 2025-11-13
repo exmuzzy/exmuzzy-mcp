@@ -141,7 +141,8 @@ ${markdownTable}
 
       // Формируем вывод
       const baseUrl = 'https://job.sbertroika.ru/browse/';
-      const jiraSearchUrl = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(jql)}`;
+      // Use simple URL format without complex JQL encoding to avoid issues in Cursor
+      const jiraSearchUrl = `https://job.sbertroika.ru/issues/?jql=assignee%3DcurrentUser()%20AND%20statusCategory%20!%3D%20Done`;
       let output = `# 📋 Мои открытые задачи\n\n`;
       output += `**Всего открытых задач**: [${total}](${jiraSearchUrl})\n`;
       output += `**Показано**: ${issues.length}\n\n`;
@@ -192,10 +193,7 @@ ${markdownTable}
 
         const taskWord = tasks.length === 1 ? 'задача' : tasks.length < 5 ? 'задачи' : 'задач';
         
-        // Создаем гиперссылку на количество задач по статусу
-        const statusJql = `assignee = currentUser() AND status = "${statusName}"`;
-        const statusSearchUrl = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(statusJql)}`;
-        let section = `### ${statusName} ([${tasks.length}](${statusSearchUrl}) ${taskWord})\n\n`;
+        let section = `### ${statusName} (${tasks.length} ${taskWord})\n\n`;
         
         const tasksToShow = sortedTasks.slice(0, maxShow);
         for (const task of tasksToShow) {
@@ -234,8 +232,11 @@ ${markdownTable}
       output += `## 🎯 Быстрые ссылки на фильтры\n\n`;
       
       const createStatusFilterLink = (statusName: string, count: number): string => {
-        const jql = `assignee = currentUser() AND status = "${statusName}"`;
-        const url = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(jql)}`;
+        // Use simple URL format without complex JQL to avoid escaping issues in Cursor
+        const baseJiraUrl = 'https://job.sbertroika.ru';
+        // Most Jira instances support simple status filter in URL
+        const statusParam = statusName.replace(/\s+/g, '%20');
+        const url = `${baseJiraUrl}/issues/?jql=assignee%3DcurrentUser()%20AND%20status%3D${statusParam}`;
         return `[${statusName} (${count})](${url})`;
       };
       
