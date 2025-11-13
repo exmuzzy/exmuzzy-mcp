@@ -174,6 +174,11 @@ ${markdownTable}
         }
       };
 
+      // Функция для проверки нужно ли показывать эмодзи приоритета (только для High и выше)
+      const shouldShowPriorityEmoji = (priorityName: string): boolean => {
+        return ['Блокер', 'Highest', 'High'].includes(priorityName);
+      };
+
       // Функция для форматирования группы задач
       const formatStatusGroup = (statusName: string, tasks: any[], maxShow: number = 20): string => {
         if (tasks.length === 0) return '';
@@ -187,19 +192,21 @@ ${markdownTable}
 
         const taskWord = tasks.length === 1 ? 'задача' : tasks.length < 5 ? 'задачи' : 'задач';
         
-        let section = `### ${statusName} (${tasks.length} ${taskWord})\n\n`;
+        // Создаем гиперссылку на количество задач по статусу
+        const statusJql = `assignee = currentUser() AND status = "${statusName}"`;
+        const statusSearchUrl = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(statusJql)}`;
+        let section = `### ${statusName} ([${tasks.length}](${statusSearchUrl}) ${taskWord})\n\n`;
         
         const tasksToShow = sortedTasks.slice(0, maxShow);
         for (const task of tasksToShow) {
-          const summary = task.fields.summary.length > 60 
-            ? task.fields.summary.substring(0, 57) + '...'
-            : task.fields.summary;
+          const summary = task.fields.summary;
           
-          // Определяем эмодзи приоритета
+          // Определяем эмодзи приоритета (только для High и выше)
           const priorityName = task.fields.priority?.name || 'Medium';
-          const priorityEmoji = getPriorityEmoji(priorityName);
+          const priorityEmoji = shouldShowPriorityEmoji(priorityName) ? getPriorityEmoji(priorityName) : '';
+          const emojiPrefix = priorityEmoji ? `${priorityEmoji} ` : '';
           
-          section += `- ${priorityEmoji} **[${task.key}](${baseUrl}${task.key})** ${summary}\n`;
+          section += `- ${emojiPrefix}**[${task.key}](${baseUrl}${task.key})** ${summary}\n`;
           section += `  - 📊 ${task.fields.status.name} | ${priorityName} | ${task.fields.issuetype.name}\n`;
           section += `  - 🔗 Быстрый доступ: \`/jira ${task.key}\` или просто \`${task.key}\`\n\n`;
         }
