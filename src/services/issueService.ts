@@ -207,8 +207,6 @@ ${markdownTable}
           const emojiPrefix = priorityEmoji ? `${priorityEmoji} ` : '';
           
           section += `- ${emojiPrefix}**[${task.key}](${baseUrl}${task.key})** ${summary}\n`;
-          section += `  - 📊 ${task.fields.status.name} | ${priorityName} | ${task.fields.issuetype.name}\n`;
-          section += `  - 🔗 Быстрый доступ: \`/jira ${task.key}\` или просто \`${task.key}\`\n\n`;
         }
 
         if (tasks.length > maxShow) {
