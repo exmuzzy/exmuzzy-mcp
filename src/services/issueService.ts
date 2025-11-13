@@ -227,28 +227,8 @@ ${markdownTable}
         output += formatStatusGroup(statusName, tasks);
       }
 
-      // Добавляем меню действий с ссылками
+      // Добавляем подсказки
       output += `\n---\n\n`;
-      output += `## 🎯 Быстрые ссылки на фильтры\n\n`;
-      
-      const createStatusFilterLink = (statusName: string, count: number): string => {
-        // Use simple URL format without complex JQL to avoid escaping issues in Cursor
-        const baseJiraUrl = 'https://job.sbertroika.ru';
-        // Most Jira instances support simple status filter in URL
-        const statusParam = statusName.replace(/\s+/g, '%20');
-        const url = `${baseJiraUrl}/issues/?jql=assignee%3DcurrentUser()%20AND%20status%3D${statusParam}`;
-        return `[${statusName} (${count})](${url})`;
-      };
-      
-      output += `- ${createStatusFilterLink('В работе', statusGroups['В работе'].length)}\n`;
-      output += `- ${createStatusFilterLink('Сделать', statusGroups['Сделать'].length)}\n`;
-      output += `- ${createStatusFilterLink('Переоткрыт', statusGroups['Переоткрыт'].length)}\n`;
-      output += `- ${createStatusFilterLink('Backlog', statusGroups['Backlog'].length)}\n`;
-      if (statusGroups['For test'].length > 0) output += `- ${createStatusFilterLink('For test', statusGroups['For test'].length)}\n`;
-      if (statusGroups['Тестирование в процессе'].length > 0) output += `- ${createStatusFilterLink('Тестирование в процессе', statusGroups['Тестирование в процессе'].length)}\n`;
-      if (statusGroups['Under Review'].length > 0) output += `- ${createStatusFilterLink('Under Review', statusGroups['Under Review'].length)}\n`;
-      output += `\n`;
-      
       output += `### 💡 Подсказки\n`;
       output += `- Для просмотра задачи: \`/jira RIVER-123\` или просто \`RIVER-123\`\n`;
       output += `- Для поиска: \`/jira <JQL запрос>\`\n`;
