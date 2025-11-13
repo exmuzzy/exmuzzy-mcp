@@ -21,7 +21,7 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.js\"",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm run test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",

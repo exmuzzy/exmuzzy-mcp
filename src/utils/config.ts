@@ -6,10 +6,10 @@ import { LOGGING, TIMEOUTS, RETRY, CACHE, VALIDATION } from './constants.js';
 
 export interface JiraConfig {
   baseUrl: string;
-  email?: string;
-  apiToken?: string;
-  bearerToken?: string;
-  sessionCookies?: string;
+  email: string | undefined;
+  apiToken: string | undefined;
+  bearerToken: string | undefined;
+  sessionCookies: string | undefined;
 }
 
 export interface AppConfig {
