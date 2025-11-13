@@ -146,15 +146,50 @@ ${markdownTable}
       output += `**Всего открытых задач**: [${total}](${jiraSearchUrl})\n`;
       output += `**Показано**: ${issues.length}\n\n`;
 
+      // Функция для получения эмодзи приоритета (соответствуют цветам Jira)
+      const getPriorityEmoji = (priorityName: string): string => {
+        switch (priorityName) {
+          case 'Блокер':      return '🔴'; // #990000 (темно-красный)
+          case 'Highest':     return '🔴'; // #ff7452 (красный)
+          case 'High':        return '🟠'; // #ff8f73 (оранжевый)
+          case 'Medium':      return '🟡'; // #ffab00 (желтый)
+          case 'Low':         return '🔵'; // #0065ff (синий)
+          case 'Lowest':      return '⚪'; // #2684ff (светло-синий)
+          case 'Незначительный': return '⚪'; // #999999 (серый)
+          default:            return '🟡'; // По умолчанию Medium
+        }
+      };
+
+      // Функция для получения числового значения приоритета (для сортировки)
+      const getPriorityValue = (priorityName: string): number => {
+        switch (priorityName) {
+          case 'Блокер':      return 0;
+          case 'Highest':     return 1;
+          case 'High':        return 2;
+          case 'Medium':      return 3;
+          case 'Low':         return 4;
+          case 'Lowest':      return 5;
+          case 'Незначительный': return 6;
+          default:            return 3; // По умолчанию Medium
+        }
+      };
+
       // Функция для форматирования группы задач
       const formatStatusGroup = (statusName: string, tasks: any[], maxShow: number = 20): string => {
         if (tasks.length === 0) return '';
+
+        // Сортируем задачи по приоритету (от высокого к низкому)
+        const sortedTasks = [...tasks].sort((a, b) => {
+          const priorityA = a.fields.priority?.name || 'Medium';
+          const priorityB = b.fields.priority?.name || 'Medium';
+          return getPriorityValue(priorityA) - getPriorityValue(priorityB);
+        });
 
         const taskWord = tasks.length === 1 ? 'задача' : tasks.length < 5 ? 'задачи' : 'задач';
         
         let section = `### ${statusName} (${tasks.length} ${taskWord})\n\n`;
         
-        const tasksToShow = tasks.slice(0, maxShow);
+        const tasksToShow = sortedTasks.slice(0, maxShow);
         for (const task of tasksToShow) {
           const summary = task.fields.summary.length > 60 
             ? task.fields.summary.substring(0, 57) + '...'
@@ -162,14 +197,9 @@ ${markdownTable}
           
           // Определяем эмодзи приоритета
           const priorityName = task.fields.priority?.name || 'Medium';
-          let priorityEmoji = '';
-          if (priorityName === 'Highest' || priorityName === 'Блокер') {
-            priorityEmoji = ' 🔴';
-          } else if (priorityName === 'High') {
-            priorityEmoji = ' 🟠';
-          }
+          const priorityEmoji = getPriorityEmoji(priorityName);
           
-          section += `- **[${task.key}](${baseUrl}${task.key})**${priorityEmoji} ${summary}\n`;
+          section += `- ${priorityEmoji} **[${task.key}](${baseUrl}${task.key})** ${summary}\n`;
           section += `  - 📊 ${task.fields.status.name} | ${priorityName} | ${task.fields.issuetype.name}\n`;
           section += `  - 🔗 Быстрый доступ: \`/jira ${task.key}\` или просто \`${task.key}\`\n\n`;
         }

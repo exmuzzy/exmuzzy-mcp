@@ -303,9 +303,15 @@ src/
 
 ### Debug Mode
 
-Enable debug logging:
+**DEBUG logging is enabled by default** to help diagnose issues. The logs show:
+- All Jira API requests (URL, method, parameters)
+- Response status and summary (total items, counts)
+- MCP tool execution (arguments, result preview)
+- Error traces and detailed messages
+
+To change log level, set environment variable:
 ```bash
-export LOG_LEVEL=DEBUG
+export LOG_LEVEL=DEBUG  # DEBUG, INFO, WARN, ERROR (default: DEBUG)
 ```
 
 ### MCP Server Logs
@@ -314,7 +320,7 @@ When running the MCP server through Cursor, you can find the logs here:
 
 **macOS:**
 ```bash
-# View the latest MCP logs
+# View live MCP logs with DEBUG output
 tail -f ~/Library/Application\ Support/Cursor/logs/*/window*/exthost/anysphere.cursor-mcp/MCP\ user-jira.log
 
 # Or list all log directories
@@ -331,12 +337,20 @@ ls -lt ~/Library/Application\ Support/Cursor/logs/
 ~/.config/Cursor/logs/
 ```
 
+**Example DEBUG output:**
+```
+[DEBUG] [JiraApiClient] Making GET request to: https://job.sbertroika.ru/rest/api/2/search?jql=...
+[DEBUG] [JiraApiClient] Response status: 200 OK
+[DEBUG] [JiraApiClient] Response summary: { total: 176, issuesCount: 176 }
+[DEBUG] [JiraMCPServer] MCP result sent to Cursor: { type: 'text', textLength: 15521 }
+```
+
 The logs include:
-- Connection status and errors
-- NPM package installation status
-- MCP protocol messages
-- Tool execution results
-- Error traces
+- **Connection status** and authentication details
+- **API requests** with full URLs and parameters
+- **API responses** with status codes and data summaries
+- **MCP protocol** messages and tool execution flow
+- **Error traces** with detailed context
 
 ## 🧪 Testing
 
