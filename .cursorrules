@@ -1,0 +1,193 @@
+# Jira MCP Server - Cursor Rules
+
+## Project Overview
+Jira Model Context Protocol (MCP) server for Cursor IDE. Provides 31 tools for Jira integration including issue management, board operations, time tracking, and project management.
+
+## Key Commands
+
+### MCP Command: `/jira`
+When user executes `/jira` command:
+
+1. **WITHOUT parameters** - ALWAYS use ONLY `mcp_jira_get_my_issues_grouped()` (1 request instead of 6)
+   - Result: All open tasks grouped by status, sorted by priority
+   - Fastest implementation - 5-6x faster than traditional approach
+
+2. **WITH issue key** (e.g., `/jira RIVER-123`) - use `mcp_jira_get_issue_details()`
+   - After displaying issue, suggest quick actions:
+     1. Form execution plan
+     2. Return to author with questions
+     3. Move to progress: `mcp_jira_transition_issue()`
+     4. Complete: `mcp_jira_transition_issue()` or `mcp_jira_complete_issue()`
+
+3. **WITH username/surname** - Search for user, then show their issues
+
+4. **WITH comment** - `/jira comment RIVER-123 "text"` → `mcp_jira_add_comment()`
+
+## Output Format Requirements
+
+### get_my_issues_grouped() Output Rules
+
+1. **Status order (by priority)**
+   - В работе (In Progress)
+   - Сделать (To Do)
+   - Переоткрыт (Reopened)
+   - Backlog
+   - Other statuses...
+
+2. **Task sorting within status**
+   - Sort by priority: descending (High → Low)
+   - Блокер → Highest → High → Medium → Low → Lowest
+
+3. **Priority emoji (only for High and above)**
+   - 🔴 Блокер, Highest
+   - 🟠 High
+   - ❌ Medium and below: NO emoji
+
+4. **Task line format**
+   - With emoji: `- 🔴 **[RIVER-3502]** Full summary text`
+   - Without emoji: `-    **[RIVER-3790]** Full summary text` (3 spaces for alignment)
+   - Summary: FULL TEXT, no truncation
+   - Only ONE line per task (no additional info rows)
+
+5. **Status header with clickable count**
+   - `### В работе ([30](URL) задач)`
+   - Number links to Jira filtered search for that status
+
+6. **Total issues count**
+   - `**Всего открытых задач**: [176](URL)` 
+   - Links to all open issues
+
+7. **Quick filter links section**
+   - `## 🎯 Быстрые ссылки на фильтры`
+   - Each status has clickable link to its filtered view
+   - Only show statuses with issues count > 0
+
+## Development Guidelines
+
+### Build & Test
+```bash
+# Build project
+make build
+
+# Test get_my_issues_grouped
+make test-grouped
+make test-grouped-full
+
+# Test specific issue
+make test-issue-detail ISSUE_KEY=RIVER-123
+
+# Run all tests
+make test-all
+
+# View logs in real-time
+make logs
+```
+
+### Code Style
+- Use TypeScript with strict type checking
+- Follow conventional commit messages
+- ESLint + Prettier for code quality
+- Add JSDoc comments for public APIs
+
+### Environment Variables
+Required:
+- `JIRA_BASE_URL` - Jira instance URL
+- `JIRA_BEARER_TOKEN` - Bearer token for auth (or `JIRA_EMAIL` + `JIRA_API_TOKEN`)
+
+Optional:
+- `LOG_LEVEL` - DEBUG (default), INFO, WARN, ERROR
+
+### Logging
+- DEBUG logging enabled by default
+- Log all Jira API requests (URL, method, parameters)
+- Log response summaries (total items, counts)
+- Log MCP result content length and preview
+
+## File Structure
+```
+src/
+├── index.ts              # MCP server entry
+├── jiraApiClient.ts      # Jira API wrapper
+├── toolRegistry.ts       # Tool definitions & routing
+├── types/
+│   └── index.ts         # TypeScript interfaces
+├── services/
+│   ├── issueService.ts  # Issue operations
+│   ├── boardService.ts  # Board operations
+│   └── ...
+└── utils/
+    ├── logger.ts        # Logging
+    ├── validation.ts    # Input validation
+    └── ...
+
+test/
+├── test-grouped-output.js      # Test get_my_issues_grouped
+├── check-priorities.js         # List Jira priorities
+└── ...
+
+docs/
+├── MAKEFILE_CHEATSHEET.md
+├── INSTALLATION_GUIDE.md
+├── CURSOR_SETUP.md
+└── ...
+```
+
+## Performance Optimizations
+- `get_my_issues_grouped()` - 1 API request instead of 6 (5-6x faster)
+- Rate limiting built-in
+- Efficient HTTP connection management
+- Automatic retry logic for transient failures
+
+## Important Notes
+
+### Git Workflow
+- ❌ NEVER use `git reset --hard` - can erase changes
+- Use `git reflog` to recover lost commits if needed
+- Always commit before making risky operations
+
+### Package Publishing
+- Current version: 1.0.8
+- Package name: `@exmuzzy/jira-mcp`
+- Binary name: `jira-mcp`
+- Use `npm version patch|minor|major` before publishing
+
+### MCP Server Configuration
+- Configured in `~/.cursor/mcp.json`
+- Local path: `node /Users/exmuzzy2/jira-mcp-server/bin/jira-mcp.js`
+- Alternative: `npx @exmuzzy/jira-mcp` (via npm registry)
+
+### Cursor Integration
+- MCP server logs: `~/Library/Application Support/Cursor/logs/*/window*/exthost/anysphere.cursor-mcp/MCP user-jira.log`
+- Use `make logs` to view in real-time
+- Use `make logs-errors` to see only errors
+
+## Response Style
+- Use emoji for visual indicators
+- 📋 for issues, ⚡ for optimizations, ✅ for completed, 🔗 for links
+- Include quick action tips for users
+- Provide direct Jira links for all items
+- Keep output clean and scannable
+
+## Troubleshooting
+
+### "Package not found" errors
+- Issue: `npx` caching or registry delay
+- Solution: Use local path in `~/.cursor/mcp.json`
+- Alternative: Clear `~/.npm/_npx` cache
+
+### Cursor not showing MCP changes
+- Solution: Fully restart Cursor (⌘Q on Mac, then reopen)
+- MCP server needs reindexing on IDE restart
+
+### Jira API errors
+- Check environment variables: `make check-env`
+- Test connection: `make test-connection`
+- View current user: `make test-current-user`
+
+## Related Files
+- `.cursorrules` - This file
+- `Makefile` - Build and test commands
+- `README.md` - Project documentation
+- `docs/MAKEFILE_CHEATSHEET.md` - Quick command reference
+- `package.json` - Project metadata and scripts
+
