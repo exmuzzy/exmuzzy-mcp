@@ -9,11 +9,19 @@
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc && chmod +x dist/index.js",
+    "build:watch": "tsc --watch",
     "clean": "rimraf dist",
-    "dev": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "test": "echo \"No tests yet\" && exit 0",
-    "prepublishOnly": "npm run build"
+    "test:watch": "npm run test -- --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.js\"",
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "keywords": [
     "mcp",
@@ -48,6 +56,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0"

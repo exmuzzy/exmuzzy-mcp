@@ -79,6 +79,7 @@ Thumbs.db
 .env.local
 .env.*.local
 .env.bak
+!.env.example
 
 # Local configuration files with secrets
 cursor-mcp-config.json
