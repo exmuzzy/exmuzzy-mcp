@@ -1,0 +1,55 @@
+{
+  "name": "@exmuzzy/exmuzzy-mcp",
+  "version": "1.0.8",
+  "description": "A comprehensive Model Context Protocol server for Jira integration with issue management, board operations, time tracking, and project management capabilities",
+  "main": "dist/index.js",
+  "bin": {
+    "exmuzzy-mcp": "./bin/exmuzzy-mcp.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "npm run clean && tsc && chmod +x dist/index.js",
+    "clean": "rimraf dist",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "echo \"No tests yet\" && exit 0",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "jira",
+    "atlassian",
+    "issue-tracking",
+    "project-management",
+    "ai",
+    "claude",
+    "automation"
+  ],
+  "author": "Alexander Korolev <exmuzzy@gmail.com>",
+  "contributors": [
+    "Oren Grinker (original author)"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exmuzzy/exmuzzy-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/exmuzzy/exmuzzy-mcp/issues"
+  },
+  "homepage": "https://github.com/exmuzzy/exmuzzy-mcp#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

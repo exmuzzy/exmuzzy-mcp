@@ -1,0 +1,5 @@
+Всегда md-файлы складывай в папку docs, кроме README.md которое в корне
+В README.md ссылайся на документы из docs
+---
+alwaysApply: true
+---
