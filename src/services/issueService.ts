@@ -109,12 +109,12 @@ ${markdownTable}
       const issues = response.issues || [];
       const total = response.total || 0;
 
-      // Группируем задачи по статусам в памяти
+      // Группируем задачи по статусам в памяти (в порядке приоритета)
       const statusGroups: Record<string, any[]> = {
-        'Backlog': [],
+        'В работе': [],
         'Сделать': [],
         'Переоткрыт': [],
-        'В работе': [],
+        'Backlog': [],
         'For test': [],
         'Тестирование в процессе': [],
         'On hold': [],
@@ -139,15 +139,20 @@ ${markdownTable}
 
       // Формируем вывод
       const baseUrl = 'https://job.sbertroika.ru/browse/';
+      const jiraSearchUrl = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(jql)}`;
       let output = `# 📋 Мои открытые задачи\n\n`;
-      output += `**Всего открытых задач**: ${total}\n`;
+      output += `**Всего открытых задач**: [${total}](${jiraSearchUrl})\n`;
       output += `**Показано**: ${issues.length}\n\n`;
 
       // Функция для форматирования группы задач
       const formatStatusGroup = (statusName: string, tasks: any[], maxShow: number = 20): string => {
         if (tasks.length === 0) return '';
 
-        let section = `### ${statusName} (${tasks.length} ${tasks.length === 1 ? 'задача' : tasks.length < 5 ? 'задачи' : 'задач'})\n\n`;
+        const statusJql = `assignee = currentUser() AND status = "${statusName}"`;
+        const statusSearchUrl = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(statusJql)}`;
+        const taskWord = tasks.length === 1 ? 'задача' : tasks.length < 5 ? 'задачи' : 'задач';
+        
+        let section = `### ${statusName} ([${tasks.length}](${statusSearchUrl}) ${taskWord})\n\n`;
         
         const tasksToShow = tasks.slice(0, maxShow);
         for (const task of tasksToShow) {
@@ -155,9 +160,18 @@ ${markdownTable}
             ? task.fields.summary.substring(0, 57) + '...'
             : task.fields.summary;
           
-          section += `- **[${task.key}](${baseUrl}${task.key})**: ${summary}\n`;
-          section += `  - 📊 ${task.fields.status.name} | ${task.fields.priority?.name || 'Нет'} | ${task.fields.issuetype.name}\n`;
-          section += `  - 🔗 Быстрый доступ: \`/jira ${task.key}\`\n\n`;
+          // Определяем эмодзи приоритета
+          const priorityName = task.fields.priority?.name || 'Medium';
+          let priorityEmoji = '';
+          if (priorityName === 'Highest' || priorityName === 'Блокер') {
+            priorityEmoji = ' 🔴';
+          } else if (priorityName === 'High') {
+            priorityEmoji = ' 🟠';
+          }
+          
+          section += `- **[${task.key}](${baseUrl}${task.key})**${priorityEmoji} ${summary}\n`;
+          section += `  - 📊 ${task.fields.status.name} | ${priorityName} | ${task.fields.issuetype.name}\n`;
+          section += `  - 🔗 Быстрый доступ: \`/jira ${task.key}\` или просто \`${task.key}\`\n\n`;
         }
 
         if (tasks.length > maxShow) {
@@ -182,18 +196,25 @@ ${markdownTable}
       // Добавляем меню действий
       output += `\n---\n\n`;
       output += `## 🎯 Быстрые действия\n\n`;
-      output += `1. **Фильтр по статусу Backlog**: задачи в бэклоге (${statusGroups['Backlog'].length})\n`;
-      output += `2. **Фильтр по статусу Сделать**: задачи к выполнению (${statusGroups['Сделать'].length})\n`;
-      output += `3. **Фильтр по статусу Переоткрыт**: переоткрытые задачи (${statusGroups['Переоткрыт'].length})\n`;
-      output += `4. **Фильтр по статусу В работе**: задачи в работе (${statusGroups['В работе'].length})\n`;
-      output += `5. **Фильтр по статусу For test**: задачи на тестировании (${statusGroups['For test'].length})\n`;
-      output += `6. **Фильтр по статусу Тестирование в процессе**: в процессе тестирования (${statusGroups['Тестирование в процессе'].length})\n`;
-      output += `7. **Фильтр по статусу On hold**: задачи на паузе (${statusGroups['On hold'].length})\n`;
-      output += `8. **Фильтр по статусу Blocked**: заблокированные задачи (${statusGroups['Blocked'].length})\n`;
-      output += `9. **Фильтр по статусу Under Review**: на проверке (${statusGroups['Under Review'].length})\n\n`;
+      
+      const createStatusLink = (status: string, count: number): string => {
+        const statusJql = `assignee = currentUser() AND status = "${status}"`;
+        const url = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(statusJql)}`;
+        return `[${count}](${url})`;
+      };
+      
+      output += `1. **Фильтр по статусу В работе**: задачи в работе (${createStatusLink('В работе', statusGroups['В работе'].length)})\n`;
+      output += `2. **Фильтр по статусу Сделать**: задачи к выполнению (${createStatusLink('Сделать', statusGroups['Сделать'].length)})\n`;
+      output += `3. **Фильтр по статусу Переоткрыт**: переоткрытые задачи (${createStatusLink('Переоткрыт', statusGroups['Переоткрыт'].length)})\n`;
+      output += `4. **Фильтр по статусу Backlog**: задачи в бэклоге (${createStatusLink('Backlog', statusGroups['Backlog'].length)})\n`;
+      output += `5. **Фильтр по статусу For test**: задачи на тестировании (${createStatusLink('For test', statusGroups['For test'].length)})\n`;
+      output += `6. **Фильтр по статусу Тестирование в процессе**: в процессе тестирования (${createStatusLink('Тестирование в процессе', statusGroups['Тестирование в процессе'].length)})\n`;
+      output += `7. **Фильтр по статусу On hold**: задачи на паузе (${createStatusLink('On hold', statusGroups['On hold'].length)})\n`;
+      output += `8. **Фильтр по статусу Blocked**: заблокированные задачи (${createStatusLink('Blocked', statusGroups['Blocked'].length)})\n`;
+      output += `9. **Фильтр по статусу Under Review**: на проверке (${createStatusLink('Under Review', statusGroups['Under Review'].length)})\n\n`;
       
       output += `### 💡 Подсказки\n`;
-      output += `- Для просмотра задачи: \`/jira RIVER-123\`\n`;
+      output += `- Для просмотра задачи: \`/jira RIVER-123\` или просто \`RIVER-123\`\n`;
       output += `- Для поиска: \`/jira <JQL запрос>\`\n`;
       output += `- Для фильтра по пользователю: \`/jira <фамилия>\`\n`;
 
