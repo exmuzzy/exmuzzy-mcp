@@ -92,12 +92,14 @@ ${markdownTable}
   async getMyIssuesGroupedByStatus(params?: { 
     maxResults?: number;
     jql?: string;
+    showAll?: boolean;
   }): Promise<ToolResult> {
     try {
       this.logger.debug('Getting my issues grouped by status');
 
       const jql = params?.jql || 'assignee = currentUser() AND statusCategory != Done';
       const maxResults = params?.maxResults || 500;
+      const showAll = params?.showAll ?? true; // По умолчанию показываем все
 
       // Выполняем ОДИН запрос для получения всех задач
       const response = await this.apiClient.searchIssues(jql, {
@@ -148,11 +150,9 @@ ${markdownTable}
       const formatStatusGroup = (statusName: string, tasks: any[], maxShow: number = 20): string => {
         if (tasks.length === 0) return '';
 
-        const statusJql = `assignee = currentUser() AND status = "${statusName}"`;
-        const statusSearchUrl = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(statusJql)}`;
         const taskWord = tasks.length === 1 ? 'задача' : tasks.length < 5 ? 'задачи' : 'задач';
         
-        let section = `### ${statusName} ([${tasks.length}](${statusSearchUrl}) ${taskWord})\n\n`;
+        let section = `### ${statusName} (${tasks.length} ${taskWord})\n\n`;
         
         const tasksToShow = tasks.slice(0, maxShow);
         for (const task of tasksToShow) {
@@ -193,25 +193,24 @@ ${markdownTable}
         output += formatStatusGroup(statusName, tasks);
       }
 
-      // Добавляем меню действий
+      // Добавляем меню действий с ссылками
       output += `\n---\n\n`;
-      output += `## 🎯 Быстрые действия\n\n`;
+      output += `## 🎯 Быстрые ссылки на фильтры\n\n`;
       
-      const createStatusLink = (status: string, count: number): string => {
-        const statusJql = `assignee = currentUser() AND status = "${status}"`;
-        const url = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(statusJql)}`;
-        return `[${count}](${url})`;
+      const createStatusFilterLink = (statusName: string, count: number): string => {
+        const jql = `assignee = currentUser() AND status = "${statusName}"`;
+        const url = `https://job.sbertroika.ru/issues/?jql=${encodeURIComponent(jql)}`;
+        return `[${statusName} (${count})](${url})`;
       };
       
-      output += `1. **Фильтр по статусу В работе**: задачи в работе (${createStatusLink('В работе', statusGroups['В работе'].length)})\n`;
-      output += `2. **Фильтр по статусу Сделать**: задачи к выполнению (${createStatusLink('Сделать', statusGroups['Сделать'].length)})\n`;
-      output += `3. **Фильтр по статусу Переоткрыт**: переоткрытые задачи (${createStatusLink('Переоткрыт', statusGroups['Переоткрыт'].length)})\n`;
-      output += `4. **Фильтр по статусу Backlog**: задачи в бэклоге (${createStatusLink('Backlog', statusGroups['Backlog'].length)})\n`;
-      output += `5. **Фильтр по статусу For test**: задачи на тестировании (${createStatusLink('For test', statusGroups['For test'].length)})\n`;
-      output += `6. **Фильтр по статусу Тестирование в процессе**: в процессе тестирования (${createStatusLink('Тестирование в процессе', statusGroups['Тестирование в процессе'].length)})\n`;
-      output += `7. **Фильтр по статусу On hold**: задачи на паузе (${createStatusLink('On hold', statusGroups['On hold'].length)})\n`;
-      output += `8. **Фильтр по статусу Blocked**: заблокированные задачи (${createStatusLink('Blocked', statusGroups['Blocked'].length)})\n`;
-      output += `9. **Фильтр по статусу Under Review**: на проверке (${createStatusLink('Under Review', statusGroups['Under Review'].length)})\n\n`;
+      output += `- ${createStatusFilterLink('В работе', statusGroups['В работе'].length)}\n`;
+      output += `- ${createStatusFilterLink('Сделать', statusGroups['Сделать'].length)}\n`;
+      output += `- ${createStatusFilterLink('Переоткрыт', statusGroups['Переоткрыт'].length)}\n`;
+      output += `- ${createStatusFilterLink('Backlog', statusGroups['Backlog'].length)}\n`;
+      if (statusGroups['For test'].length > 0) output += `- ${createStatusFilterLink('For test', statusGroups['For test'].length)}\n`;
+      if (statusGroups['Тестирование в процессе'].length > 0) output += `- ${createStatusFilterLink('Тестирование в процессе', statusGroups['Тестирование в процессе'].length)}\n`;
+      if (statusGroups['Under Review'].length > 0) output += `- ${createStatusFilterLink('Under Review', statusGroups['Under Review'].length)}\n`;
+      output += `\n`;
       
       output += `### 💡 Подсказки\n`;
       output += `- Для просмотра задачи: \`/jira RIVER-123\` или просто \`RIVER-123\`\n`;

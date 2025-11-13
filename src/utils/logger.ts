@@ -15,13 +15,13 @@ export class Logger {
   }
 
   private getLogLevel(): LogLevel {
-    const level = process.env.LOG_LEVEL?.toUpperCase() || 'INFO';
+    const level = process.env.LOG_LEVEL?.toUpperCase() || 'DEBUG';
     switch (level) {
       case 'ERROR': return LogLevel.ERROR;
       case 'WARN': return LogLevel.WARN;
       case 'INFO': return LogLevel.INFO;
       case 'DEBUG': return LogLevel.DEBUG;
-      default: return LogLevel.INFO;
+      default: return LogLevel.DEBUG;
     }
   }
 

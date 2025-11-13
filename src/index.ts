@@ -83,10 +83,22 @@ class JiraMCPServer {
       const { name, arguments: args } = request.params;
       
       logger.info(`Executing tool: ${name}`, { args });
+      logger.debug(`Tool call arguments:`, args);
 
       try {
         const result = await this.toolRegistry.executeTool(name, args || {});
         logger.info(`Tool ${name} executed successfully`);
+        
+        // Log MCP result summary
+        if (result.content && Array.isArray(result.content)) {
+          const contentSummary = result.content.map((c: any) => ({
+            type: c.type,
+            textLength: c.text?.length || 0,
+            textPreview: c.text?.substring(0, 200) || ''
+          }));
+          logger.debug(`MCP result sent to Cursor:`, contentSummary);
+        }
+        
         return result;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -344,6 +344,9 @@ export class JiraApiClient {
     }
 
     this.logger.debug(`Making ${method} request to: ${url}`);
+    if (body !== undefined) {
+      this.logger.debug(`Request body:`, body);
+    }
 
     try {
       const fetchOptions: RequestInit = {
@@ -358,6 +361,8 @@ export class JiraApiClient {
       }
 
       const response = await fetch(url, fetchOptions);
+      
+      this.logger.debug(`Response status: ${response.status} ${response.statusText}`);
 
       // Handle redirects (302) - might indicate need for session
       if (response.status === 302 || response.status === 401) {
@@ -412,9 +417,25 @@ export class JiraApiClient {
 
       const responseText = await response.text();
       if (!responseText) {
+        this.logger.debug(`Empty response body`);
         return {} as T;
       }
-      return JSON.parse(responseText) as T;
+      
+      const parsedResponse = JSON.parse(responseText) as T;
+      
+      // Log response summary (limit to avoid huge logs)
+      if (typeof parsedResponse === 'object' && parsedResponse !== null) {
+        const summary: any = {};
+        if ('total' in parsedResponse) summary.total = (parsedResponse as any).total;
+        if ('issues' in parsedResponse) summary.issuesCount = (parsedResponse as any).issues?.length;
+        if ('maxResults' in parsedResponse) summary.maxResults = (parsedResponse as any).maxResults;
+        if ('startAt' in parsedResponse) summary.startAt = (parsedResponse as any).startAt;
+        if (Object.keys(summary).length > 0) {
+          this.logger.debug(`Response summary:`, summary);
+        }
+      }
+      
+      return parsedResponse;
     } catch (error) {
       this.logger.error(`API request failed for ${url}:`, error);
       
