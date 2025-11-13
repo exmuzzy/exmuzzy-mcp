@@ -204,9 +204,10 @@ ${markdownTable}
           // Определяем эмодзи приоритета (только для High и выше)
           const priorityName = task.fields.priority?.name || 'Medium';
           const priorityEmoji = shouldShowPriorityEmoji(priorityName) ? getPriorityEmoji(priorityName) : '';
-          const emojiPrefix = priorityEmoji ? `${priorityEmoji} ` : '';
+          // Выравниваем позицию ключа: если нет эмодзи, добавляем пробелы
+          const spacing = priorityEmoji ? `${priorityEmoji} ` : '   ';
           
-          section += `- ${emojiPrefix}**[${task.key}](${baseUrl}${task.key})** ${summary}\n`;
+          section += `- ${spacing}**[${task.key}](${baseUrl}${task.key})** ${summary}\n`;
         }
 
         if (tasks.length > maxShow) {
